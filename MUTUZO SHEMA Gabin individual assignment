@@ -1,0 +1,95 @@
+from collections import deque
+
+class Member:
+    def __init__(self, member_id, member_name, membership_status):
+        self.member_id = member_id
+        self.member_name = member_name
+        self.membership_status = membership_status  
+
+class GymMembershipManager:
+    def __init__(self):
+        self.new_applications = deque()  
+        self.renewal_stack = []  
+        self.active_members = []  
+
+    def add_new_application(self, member_id, member_name):
+        self.new_applications.append(Member(member_id, member_name, False))
+        print(f"New membership application added for {member_name} (ID: {member_id}).")
+
+    def process_application(self):
+        if not self.new_applications:
+            print("No new membership applications to process.")
+            return
+        
+        member = self.new_applications.popleft()
+        member.membership_status = True
+        self.active_members.append(member)
+        print(f"Membership application approved for {member.member_name} (ID: {member.member_id}).")
+
+    def renew_membership(self, member_id):
+        for member in self.active_members:
+            if member.member_id == member_id and not member.membership_status:
+                member.membership_status = True
+                self.renewal_stack.append(member)
+                print(f"Membership for {member.member_name} (ID: {member_id}) has been renewed.")
+                return
+        print(f"No inactive membership found for ID: {member_id}")
+
+    def undo_renewal(self):
+        if not self.renewal_stack:
+            print("No renewals to undo.")
+            return
+        
+        last_renewed_member = self.renewal_stack.pop()
+        last_renewed_member.membership_status = False
+        print(f"Undo membership renewal for {last_renewed_member.member_name} (ID: {last_renewed_member.member_id}).")
+
+    def display_active_members(self):
+        if not self.active_members:
+            print("No active members.")
+            return
+        
+        print("\nActive Members:")
+        for member in self.active_members:
+            status = "Active" if member.membership_status else "Inactive"
+            print(f"ID: {member.member_id}, Name: {member.member_name}, Status: {status}")
+
+
+manager = GymMembershipManager()
+manager.add_new_application(101, 'Alice')
+manager.add_new_application(102, 'Bob')
+
+manager.process_application()  
+manager.process_application()  
+manager.renew_membership(101) 
+manager.undo_renewal()  
+manager.display_active_members()
+def main():
+    while True:
+        print("\n1. add new apllication")
+        print("2. Add Processing")
+        print("3. renew membership")
+        print("4. undo membership")
+        print("5. display active members")
+        print("6. Exit")
+        question = input("choose option below: ")
+        if question == '1':
+            id = int(input("Enter new id: "))
+            name = input("Enter new name: ")
+            manager.add_new_application(id, name)
+        elif question == '2':
+            manager.process_application()
+        elif question == '3':
+            id = int(input("Enter new id: "))
+            manager.renew_membership(id)
+        elif question == '4':
+            manager.undo_renewal()
+        elif question == '5':
+            manager.display_active_members()
+        elif question == '6':
+            print("Thank you !")
+            break
+        else:
+            print("choose please")
+
+main()
