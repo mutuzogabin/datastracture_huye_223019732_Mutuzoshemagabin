@@ -1,0 +1,131 @@
+from collections import deque
+class Driver:
+    def __init__(self, driver_id, driver_name, location, availability):
+        self.driver_id = driver_id
+        self.driver_name = driver_name
+        self.location = location
+        self.availability = availability
+
+class RideSharingSystem:
+    def __init__(self):
+        self.waiting_queue = deque()  
+        self.cancellation_stack = [] 
+        self.drivers = [] 
+
+    def add_driver(self, driverId ,driverName, location, availability):
+        driver = Driver(driverId, driverName, location, availability)
+        self.drivers.append(driver)
+
+    def display_drivers(self):
+        print("\nAvailable Drivers:")
+        for driver in self.drivers:
+            availability = "Yes" if driver.availability else "No"
+            print(f"- DriverID: {driver.driver_id}, Name: {driver.driver_name}, Location: {driver.location}, Available: {availability}")
+
+    def request_ride(self, passenger_name, location):
+        self.waiting_queue.append((passenger_name, location))
+        print(f"Passenger '{passenger_name}' is waiting for a ride from '{location}'.")
+
+    def assign_ride(self):
+        if not self.waiting_queue:
+            print("No passengers waiting for rides.")
+            return
+
+        # Find an available driver
+        available_driver = next((driver for driver in self.drivers if driver.availability), None)
+        if not available_driver:
+            print("No drivers available at the moment.")
+            return
+
+        # Assign the next passenger in queue to the available driver
+        passenger, location = self.waiting_queue.pop(0)
+        print(f"Assigning {passenger} to driver {available_driver.driver_name} at location {available_driver.location}.")
+        self.cancellation_stack.append((available_driver, passenger))
+        available_driver.availability = False
+
+    def cancel_ride(self):
+        if not self.cancellation_stack:
+            print("No rides to cancel.")
+            return
+
+        driver, passenger = self.cancellation_stack.pop()
+        print(f"Ride for passenger '{passenger}' with driver '{driver.driver_name}' has been cancelled.")
+        driver.availability = True
+
+    def display_queue(self):
+        if not self.waiting_queue:
+            print("No passengers in the queue.")
+        else:
+            print("\nPassengers waiting for rides:")
+            for passenger, location in self.waiting_queue:
+                print(f"- {passenger} at {location}")
+
+# Main program to handle user input
+def main():
+    system = RideSharingSystem()
+    system.add_driver(801, 'John Doe', 'Downtown', True)
+    system.add_driver(802, 'Jane Smith', 'Airport', False)
+    system.add_driver(803, 'Mike Johnson', 'Train Station', True)
+    system.add_driver(805, 'John Doe', 'Downtown', True)
+    system.add_driver(806, 'John Doe', 'Downtown', True)
+    system.add_driver(807, 'John Doe', 'Downtown', True)
+    system.add_driver(812, 'Chloe Hill', 'Train Station', True)
+    system.add_driver(82, 'John Doe', 'Downtown', True)
+    system.add_driver(848, 'Nathan Phillips', 'Beach', True)
+    system.add_driver(81, 'John Doe', 'Downtown', True)
+    system.add_driver(801, 'John Doe', 'Downtown', True)
+    system.add_driver(802, 'Jane Smith', 'Airport', False)
+    system.add_driver(803, 'Mike Johnson', 'Train Station', True)
+    system.add_driver(805, 'John Doe', 'Downtown', True)
+    system.add_driver(806, 'John Doe', 'Downtown', True)
+    system.add_driver(807, 'John Doe', 'Downtown', True)
+    system.add_driver(812, 'Chloe Hill', 'Train Station', True)
+    system.add_driver(82, 'John Doe', 'Downtown', True)
+    system.add_driver(848, 'Nathan Phillips', 'Beach', True)
+    system.add_driver(81, 'John Doe', 'Downtown', True)
+
+    while True:
+        print("\nOptions:")
+        print("1. Display available drivers")
+        print("2. Request a ride")
+        print("3. Assign ride")
+        print("4. Cancel last ride")
+        print("5. Display waiting queue")
+        print("6. Add Driver")
+        print("7. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            system.display_drivers()
+
+        elif choice == "2":
+            passenger_name = input("Enter passenger name: ")
+            location = input("Enter passenger location: ")
+            system.request_ride(passenger_name, location)
+
+        elif choice == "3":
+            system.assign_ride()
+
+        elif choice == "4":
+            system.cancel_ride()
+
+        elif choice == "5":
+            system.display_queue()
+            
+        elif choice == "6":
+            id = int(input("Enter driver Id :").strip())
+            name = input("Enter driver name :").strip().lower()
+            location = input("Enter driver location :").strip().lower()
+            availability = input("is availabile True/False:").strip()
+            system.add_driver(id, name, location, availability)
+
+        elif choice == "7":
+            print("Exiting...")
+            break
+
+        else:
+            print("Invalid choice, please try again.")
+
+
+main()
